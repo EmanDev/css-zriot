@@ -1,7 +1,7 @@
 /**
  * vim: set ts=4 :
  * =============================================================================
- * SourceMod (C)2004-2009 AlliedModders LLC.  All rights reserved.
+ * SourceMod (C)2004-2008 AlliedModders LLC.  All rights reserved.
  * =============================================================================
  *
  * This file is part of the SourceMod/SourcePawn SDK.
@@ -30,20 +30,23 @@
  * Version: $Id$
  */
 
-#if defined _sdktools_hooks_included
+#if defined _sdktools_client_included
   #endinput
 #endif
-#define _sdktools_hooks_included
+#define _sdktools_client_included
 
 /**
- * @brief Called when a clients movement buttons are being processed
+ * Sets the client to an inactive state waiting for a new map
  *
- * @param client	Index of the client.
- * @param buttons	Copyback buffer containing the current commands (as bitflags - see entity_prop_stocks.inc).
- * @param impulse	Copyback buffer containing the current impulse command.
- * @param vel		Players desired velocity.
- * @param angles	Players desired view angles.
- * @param weapon	Entity index of the new weapon if player switches weapon, 0 otherwise.
- * @return 			Plugin_Handled to block the commands from being processed, Plugin_Continue otherwise.
+ * @param client		The client index
+ * @noreturn
  */
-forward Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon);
+native InactivateClient(client);
+
+/**
+ * Reconnect a client without dropping the netchannel
+ *
+ * @param client		The client index
+ * @noreturn
+ */
+native ReconnectClient(client);

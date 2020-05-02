@@ -88,7 +88,7 @@ native ClearArray(Handle:array);
  * @return				New handle to the cloned array object
  * @error				Invalid Handle
  */
- native Handle:CloneArray(Handle:array);
+native Handle:CloneArray(Handle:array);
 
 /**
  * Resizes an array.  If the size is smaller than the current size,
@@ -199,7 +199,7 @@ native GetArrayArray(Handle:array, index, any:buffer[], size=-1);
  * @noreturn
  * @error				Invalid Handle, invalid index, or invalid block.
  */
-native any:SetArrayCell(Handle:array, index, any:value, block=0, bool:asChar=false);
+native SetArrayCell(Handle:array, index, any:value, block=0, bool:asChar=false);
 
 /**
  * Sets a string value in an array.

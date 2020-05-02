@@ -122,6 +122,23 @@ enum ConVarQueryResult
 native ServerCommand(const String:format[], any:...);
 
 /**
+ * Executes a server command as if it were on the server console (or RCON) 
+ * and stores the printed text into buffer.
+ *
+ * Warning: This calls ServerExecute internally and may have issues if
+ * certain commands are in the buffer, only use when you really need
+ * the response.
+ * Also, on L4D2 this will not print the command output to the server console.
+ *
+ * @param buffer		String to store command result into.
+ * @param maxlen		Length of buffer.
+ * @param format		Formatting rules.
+ * @param ...			Variable number of format parameters.
+ * @noreturn
+ */
+native ServerCommandEx(String:buffer[], maxlen, const String:format[], any:...);
+
+/**
  * Inserts a server command at the beginning of the server command buffer.
  *
  * @param format		Formatting rules.
@@ -473,9 +490,8 @@ native bool:GetConVarBool(Handle:convar);
 /**
  * Sets the boolean value of a console variable.
  *
- * Note: The replicate and notify params are ignored on the engines for Episode 2/Orange Box
- * and Left 4 Dead. These engines automatically replicates and notifies as soon as the convar
- * is changed.
+ * Note: The replicate and notify params are only relevant for the original, Dark Messiah, and
+ * Episode 1 engines. Newer engines automatically do these things when the convar value is changed.
  *
  * @param convar		Handle to the convar.
  * @param value			New boolean value.
@@ -501,9 +517,8 @@ native GetConVarInt(Handle:convar);
 /**
  * Sets the integer value of a console variable.
  *
- * Note: The replicate and notify params are ignored on the engines for Episode 2/Orange Box
- * and Left 4 Dead. These engines automatically replicates and notifies as soon as the convar
- * is changed.
+ * Note: The replicate and notify params are only relevant for the original, Dark Messiah, and
+ * Episode 1 engines. Newer engines automatically do these things when the convar value is changed.
  *
  * @param convar		Handle to the convar.
  * @param value			New integer value.
@@ -529,9 +544,8 @@ native Float:GetConVarFloat(Handle:convar);
 /**
  * Sets the floating point value of a console variable.
  *
- * Note: The replicate and notify params are ignored on the engines for Episode 2/Orange Box
- * and Left 4 Dead. These engines automatically replicates and notifies as soon as the convar
- * is changed.
+ * Note: The replicate and notify params are only relevant for the original, Dark Messiah, and
+ * Episode 1 engines. Newer engines automatically do these things when the convar value is changed.
  *
  * @param convar		Handle to the convar.
  * @param value			New floating point value.
@@ -559,9 +573,8 @@ native GetConVarString(Handle:convar, String:value[], maxlength);
 /**
  * Sets the string value of a console variable.
  *
- * Note: The replicate and notify params are ignored on the engines for Episode 2/Orange Box
- * and Left 4 Dead. These engines automatically replicates and notifies as soon as the convar
- * is changed.
+ * Note: The replicate and notify params are only relevant for the original, Dark Messiah, and
+ * Episode 1 engines. Newer engines automatically do these things when the convar value is changed.
  *
  * @param convar		Handle to the convar.
  * @param value			New string value.
@@ -578,9 +591,8 @@ native SetConVarString(Handle:convar, const String:value[], bool:replicate=false
 /**
  * Resets the console variable to its default value.
  *
- * Note: The replicate and notify params are ignored on the engines for Episode 2/Orange Box
- * and Left 4 Dead. These engines automatically replicates and notifies as soon as the convar
- * is changed.
+ * Note: The replicate and notify params are only relevant for the original, Dark Messiah, and
+ * Episode 1 engines. Newer engines automatically do these things when the convar value is changed.
  *
  * @param convar		Handle to the convar.
  * @param replicate		If set to true, the new convar value will be set on all clients.
@@ -592,6 +604,17 @@ native SetConVarString(Handle:convar, const String:value[], bool:replicate=false
  * @error				Invalid or corrupt Handle.
  */
 native ResetConVar(Handle:convar, bool:replicate=false, bool:notify=false);
+
+/**
+ * Retrieves the default string value of a console variable.
+ *
+ * @param convar		Handle to the convar.
+ * @param value			Buffer to store the default value of the convar.
+ * @param maxlength		Maximum length of string buffer.
+ * @return				Number of bytes written to the buffer (UTF-8 safe).
+ * @error				Invalid or corrupt Handle.
+ */
+native GetConVarDefault(Handle:convar, String:value[], maxlength);
 
 /**
  * Returns the bitstring of flags on a console variable.
@@ -639,12 +662,12 @@ native SetConVarBounds(Handle:convar, ConVarBounds:type, bool:set, Float:value=0
  * Retrieves the name of a console variable.
  *
  * @param convar		Handle to the convar.
- * @param value			Buffer to store the name of the convar.
+ * @param name			Buffer to store the name of the convar.
  * @param maxlength		Maximum length of string buffer.
  * @noreturn
  * @error				Invalid or corrupt Handle.     
  */
-native GetConVarName(Handle:convar, const String:name[], maxlength);
+native GetConVarName(Handle:convar, String:name[], maxlength);
 
 funcenum ConVarQueryFinished
 {	
@@ -716,8 +739,8 @@ native bool:ReadCommandIterator(Handle:iter,
 
 /**
  * Returns whether a client has access to a given command string.  The string 
- * can also be any override string, as overrides can be independent of 
- * commands.  This important feature essentially allows you to create custom 
+ * can be any override string, as overrides can be independent of 
+ * commands.  This feature essentially allows you to create custom 
  * flags using the override system.
  *
  * @param client		Client index.
@@ -732,6 +755,28 @@ native bool:ReadCommandIterator(Handle:iter,
  * @return				True if the client has access, false otherwise.
  */
 native bool:CheckCommandAccess(client, 
+							   const String:command[],
+							   flags,
+							   bool:override_only=false);
+
+/**
+ * Returns whether an admin has access to a given command string.  The string 
+ * can be any override string, as overrides can be independent of 
+ * commands.  This feature essentially allows you to create custom flags
+ * using the override system.
+ *
+ * @param id			AdminId of the admin.
+ * @param command		Command name.  If the command is not found, the default 
+ *						flags are used.
+ * @param flags			Flag string to use as a default, if the command or override 
+ *						is not found.
+ * @param override_only	If true, SourceMod will not attempt to find a matching 
+ *						command, and it will only use the default flags specified.
+ *						Otherwise, SourceMod will ignore the default flags if 
+ *						there is a matching admin command.
+ * @return				True if the admin has access, false otherwise.
+ */
+native bool:CheckAccess(AdminId:id, 
 							   const String:command[],
 							   flags,
 							   bool:override_only=false);
@@ -839,7 +884,11 @@ native RemoveServerTag(const String:tag[]);
 /**
  * Callback for command listeners. This is invoked whenever any command
  * reaches the server, from the server console itself or a player.
-
+ *
+ * Clients may be in the process of connecting when they are executing commands
+ * IsClientConnected(client) is not guaranteed to return true.  Other functions
+ * such as GetClientIP() may not work at this point either.
+ *
  * Returning Plugin_Handled or Plugin_Stop will prevent the original,
  * baseline code from running.
  *
@@ -849,8 +898,8 @@ native RemoveServerTag(const String:tag[]);
  *  * C++ command dispatch hooks from Metamod:Source plugins
  *  * Reg*Cmd() hooks that did not create new commands.
  *
- * @param client        Client, or 0 for server. Client will be connected but
- *                      not necessarily in game.
+ * @param client        Client, or 0 for server.
+ *                      Client may not be connected or in game.
  * @param command       Command name, lower case. To get name as typed, use
  *                      GetCmdArg() and specify argument 0.
  * @param argc          Argument count.

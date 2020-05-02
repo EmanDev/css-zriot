@@ -347,7 +347,7 @@ native AdminId:CreateAdmin(const String:name[]="");
  * @param maxlength		Maximum size of string buffer.
  * @return				Number of bytes written.
  */
-native GetAdminUsername(AdminId:id, const String:name[], maxlength);
+native GetAdminUsername(AdminId:id, String:name[], maxlength);
 
 /**
  * Binds an admin to an identity for fast lookup later on.  The bind must be unique.
@@ -515,6 +515,15 @@ native bool:FindFlagByName(const String:name[], &AdminFlag:flag);
  * @return				True on success, false if not found.
  */
 native bool:FindFlagByChar(c, &AdminFlag:flag);
+
+/**
+ * Finds a flag char by a gived admin flag.
+ *
+ * @param flag                 Flag to look up.
+ * @param c                    Variable to store flag char.
+ * @return                     True on success, false if not found.
+ */
+native bool:FindFlagChar(AdminFlag:flag, &c);
 
 /**
  * Converts a string of flag characters to a bit string.

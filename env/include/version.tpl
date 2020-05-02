@@ -1,7 +1,7 @@
 /**
  * vim: set ts=4 :
  * =============================================================================
- * SourceMod (C)2004-2009 AlliedModders LLC.  All rights reserved.
+ * SourceMod (C)2004-2008 AlliedModders LLC.  All rights reserved.
  * =============================================================================
  *
  * This file is part of the SourceMod/SourcePawn SDK.
@@ -29,21 +29,14 @@
  *
  * Version: $Id$
  */
-
-#if defined _sdktools_hooks_included
-  #endinput
+ 
+#if defined _version_included
+ #endinput
 #endif
-#define _sdktools_hooks_included
+#define _version_included
 
-/**
- * @brief Called when a clients movement buttons are being processed
- *
- * @param client	Index of the client.
- * @param buttons	Copyback buffer containing the current commands (as bitflags - see entity_prop_stocks.inc).
- * @param impulse	Copyback buffer containing the current impulse command.
- * @param vel		Players desired velocity.
- * @param angles	Players desired view angles.
- * @param weapon	Entity index of the new weapon if player switches weapon, 0 otherwise.
- * @return 			Plugin_Handled to block the commands from being processed, Plugin_Continue otherwise.
- */
-forward Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon);
+#define SOURCEMOD_V_MAJOR		$PMAJOR$				/**< SourceMod Major version */
+#define SOURCEMOD_V_MINOR		$PMINOR$				/**< SourceMod Minor version */
+#define SOURCEMOD_V_RELEASE		$PREVISION$				/**< SourceMod Release version */
+
+#define SOURCEMOD_VERSION	"$PMAJOR$.$PMINOR$.$PREVISION$$BUILD_STRING$"	/**< SourceMod version string (major.minor.release.build) */

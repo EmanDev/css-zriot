@@ -73,7 +73,7 @@ public OnPluginStart()
     CreateCommands();
     HookCommands();
     FindOffsets();
-    SetupGameData();
+    //SetupGameData();
     InitTeamControl();
     InitWeaponRestrict();
     

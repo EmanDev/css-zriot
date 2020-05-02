@@ -16,8 +16,8 @@ new offsBuyZone;
 new offsFadeMin;
 new offsFadeMax;
 
-new Handle:hGameConf = INVALID_HANDLE;
-new Handle:hTerminateRound = INVALID_HANDLE;
+//new Handle:hGameConf = INVALID_HANDLE;
+//new Handle:hTerminateRound = INVALID_HANDLE;
 
 FindOffsets()
 {
@@ -76,7 +76,7 @@ FindOffsets()
     }
 }
 
-SetupGameData()
+/*SetupGameData()
 {
     hGameConf = LoadGameConfigFile("plugin.zombieriot");
     
@@ -85,7 +85,7 @@ SetupGameData()
     PrepSDKCall_AddParameter(SDKType_Float, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     hTerminateRound = EndPrepSDKCall();
-}
+}*/
 
 SetPlayerVelocity(client, const Float:vec[3])
 {
@@ -187,8 +187,9 @@ stock Util_RemovePlayerItem(client, weaponindex)
 
 TerminateRound(Float:delay, reason)
 {
-    if (tHUD == INVALID_HANDLE)
+    /*if (tHUD == INVALID_HANDLE)
         return;
     
-    SDKCall(hTerminateRound, delay, reason);
+    SDKCall(hTerminateRound, delay, reason);*/
+    CS_TerminateRound(delay, CSRoundEndReason:reason, false);
 }
