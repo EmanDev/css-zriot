@@ -7,12 +7,50 @@
  */
 
 new String:skyname[32];
+new String:hostname[256];
 
 new gZombieID[MAXPLAYERS+1];
+
+HookCommands()
+{
+    RegConsoleCmd("nightvision", Command_NightVision);
+}
+
+public Action:Command_NightVision(client, argc)
+{
+    new bool:allow_disable = GetConVarBool(gCvars[CVAR_ZVISION_ALLOW_DISABLE]);
+    new bool:enabled = GetConVarBool(gCvars[CVAR_ENABLE]);
+    if (!allow_disable || !enabled)
+    {
+        return;
+    }
+    
+    if (!IsPlayerZombie(client))
+    {
+        return;
+    }
+    
+    bZVision[client] = !bZVision[client];
+    
+    if (bZVision[client])
+    {
+        StartZVision(client);
+    }
+    else
+    {
+        StopZVision(client);
+        ClientCommand(client, "r_screenoverlay \"\"");
+    }
+}
 
 FindMapSky()
 {
     GetConVarString(FindConVar("sv_skyname"), skyname, sizeof(skyname));
+}
+
+FindHostname()
+{
+    GetConVarString(FindConVar("hostname"), hostname, sizeof(hostname));
 }
 
 ChangeLightStyle()
@@ -36,6 +74,16 @@ ChangeLightStyle()
     }
 }
 
+UpdateHostname()
+{
+    decl String:hostname_prefixed[256];
+    
+    SetGlobalTransTarget(LANG_SERVER);
+    Format(hostname_prefixed, sizeof(hostname_prefixed), "%t %s", "Hostname prefix", gDay + 1, dCount, hostname);
+    
+    SetHostname(hostname_prefixed);
+}
+
 Zombify(client, zombieid)
 {
     gZombieID[client] = zombieid;
@@ -54,6 +102,11 @@ Zombify(client, zombieid)
     ApplyZombieSpeed(client, zombieid);
     ApplyZombieGravity(client, zombieid);
     ApplyZombieFOV(client, zombieid);
+    
+    if (bZVision[client])
+    {
+        StartZVision(client);
+    }
 }
 
 ZombiesWin()
@@ -69,6 +122,9 @@ ZombiesWin()
     if (fade)
         Fade(0, 2000, 2000, 2, 255, 0, 0, 255);
     
+    new bool:overlays = GetConVarBool(gCvars[CVAR_OVERLAYS]);
+    if (overlays)
+        ShowOverlays(5.0, gZombieTeam);
     
     FreezeZombies();
 }
@@ -90,6 +146,9 @@ HumansWin()
     if (fade)
         Fade(0, 2000, 2000, 2, 0, 0, 255, 255);
     
+    new bool:overlays = GetConVarBool(gCvars[CVAR_OVERLAYS]);
+    if (overlays)
+        ShowOverlays(5.0, gHumanTeam);
     
     FreezeZombies();
 }
@@ -233,6 +292,65 @@ public Action:HumanRespawn(Handle:timer, any:index)
     return Plugin_Stop;
 }
 
+StartZVision(client)
+{
+    if (tZVision[client] != INVALID_HANDLE)
+    {
+        CloseHandle(tZVision[client]);
+        tZVision[client] = INVALID_HANDLE;
+    }
+    
+    new bool:zvision = ZVision(client);
+    if (zvision)
+    {
+        new Float:redisplay = GetConVarFloat(gCvars[CVAR_ZVISION_REDISPLAY]);
+        tZVision[client] = CreateTimer(redisplay, ZVisionTimer, client, TIMER_REPEAT);
+    }
+}
+
+StopZVision(client)
+{
+    if (tZVision[client] != INVALID_HANDLE)
+    {
+        CloseHandle(tZVision[client]);
+        tZVision[client] = INVALID_HANDLE;
+    }
+}
+
+bool:ZVision(client)
+{
+    if (IsFakeClient(client))
+    {
+        return false;
+    }
+    
+    decl String:zvision[256];
+    GetZombieZVision(gZombieID[client], zvision, sizeof(zvision));
+    
+    if (zvision[0])
+    {
+        DisplayClientOverlay(client, zvision);
+        
+        return true;
+    }
+    
+    return false;
+}
+
+public Action:ZVisionTimer(Handle:timer, any:index)
+{
+    if (!IsClientInGame(index) || !IsPlayerZombie(index))
+    {
+        tZVision[index] = INVALID_HANDLE;
+        
+        return Plugin_Stop;
+    }
+    
+    ZVision(index);
+        
+    return Plugin_Continue;
+}
+
 public Action:RemoveRagdoll(Handle:timer, any:ragdoll)
 {
     if (ragdoll == -1 || !IsValidEdict(ragdoll))
@@ -321,6 +439,17 @@ GetClientDeathCount(client)
     GetTrieValue(trieDeaths, steamid, value);
     
     return value;
+}
+
+SetHostname(const String:name[])
+{
+    new bool:update_hostname = GetConVarBool(gCvars[CVAR_HOSTNAME_UPDATE]);
+    if (!update_hostname)
+    {
+        return;
+    }
+    
+    ServerCommand("hostname \"%s\"", name);
 }
 
 ZRiot_Zombie(client)

@@ -12,18 +12,24 @@
 #include <sdkhooks>
 #include <cstrike>
 
-#define VERSION "1.9.1b_fixed_by_404"
+#undef REQUIRE_PLUGIN
+#include <market>
+
+#define VERSION "1.9.1b"
 
 #include "zriot/zombieriot"
 #include "zriot/global"
 #include "zriot/cvars"
 #include "zriot/translation"
 #include "zriot/offsets"
+#include "zriot/ambience"
 #include "zriot/zombiedata"
 #include "zriot/daydata"
 #include "zriot/targeting"
+#include "zriot/overlays"
 #include "zriot/zombie"
 #include "zriot/hud"
+#include "zriot/sayhooks"
 #include "zriot/teamcontrol"
 #include "zriot/weaponrestrict"
 #include "zriot/commands"
@@ -61,16 +67,23 @@ public OnPluginStart()
     // ======================================================================
     
     HookEvents();
+    HookChatCmds();
     CreateCvars();
     HookCvars();
     CreateCommands();
+    HookCommands();
     FindOffsets();
+    SetupGameData();
     InitTeamControl();
     InitWeaponRestrict();
     
     // ======================================================================
     
     trieDeaths = CreateTrie();
+    
+    // ======================================================================
+    
+    market = LibraryExists("market");
     
     // ======================================================================
     
@@ -84,6 +97,22 @@ public OnPluginStart()
 public OnPluginEnd()
 {
     ZRiotEnd();
+}
+
+public OnLibraryRemoved(const String:name[])
+{
+	if (StrEqual(name, "market"))
+	{
+		market = false;
+	}
+}
+ 
+public OnLibraryAdded(const String:name[])
+{
+	if (StrEqual(name, "market"))
+	{
+		market = true;
+	}
 }
 
 public OnMapStart()
@@ -106,6 +135,10 @@ public OnMapStart()
 public OnConfigsExecuted()
 {
     UpdateTeams();
+    
+    FindHostname();
+    
+    LoadAmbienceData();
     
     decl String:mapconfig[PLATFORM_MAX_PATH];
     
@@ -131,6 +164,8 @@ public OnClientPutInServer(client)
     new deaths_before_zombie = GetDayDeathsBeforeZombie(gDay);
     
     bZombie[client] = !fakeclient ? ((deaths_before_zombie > 0) && (fakeclient || (deathcount >= deaths_before_zombie))) : true;
+    
+    bZVision[client] = !IsFakeClient(client);
     
     gZombieID[client] = -1;
     
@@ -173,6 +208,7 @@ MapChangeCleanup()
     ClearArray(restrictedWeapons);
     ClearTrie(trieDeaths);
     
+    tAmbience = INVALID_HANDLE;
     tHUD = INVALID_HANDLE;
     tFreeze = INVALID_HANDLE;
 }
@@ -191,6 +227,8 @@ CheckMapConfig()
 ZRiotEnd()
 {
     TerminateRound(3.0, Game_Commencing);
+    
+    SetHostname(hostname);
     
     UnhookCvars();
     UnhookEvents();

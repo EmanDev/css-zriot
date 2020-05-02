@@ -16,6 +16,9 @@ new offsBuyZone;
 new offsFadeMin;
 new offsFadeMax;
 
+new Handle:hGameConf = INVALID_HANDLE;
+new Handle:hTerminateRound = INVALID_HANDLE;
+
 FindOffsets()
 {
     offsBaseVelocity = FindSendPropInfo("CBasePlayer", "m_vecBaseVelocity");
@@ -73,6 +76,17 @@ FindOffsets()
     }
 }
 
+SetupGameData()
+{
+    hGameConf = LoadGameConfigFile("plugin.zombieriot");
+    
+    StartPrepSDKCall(SDKCall_GameRules);
+    PrepSDKCall_SetFromConf(hGameConf, SDKConf_Signature, "TerminateRound");
+    PrepSDKCall_AddParameter(SDKType_Float, SDKPass_Plain);
+    PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
+    hTerminateRound = EndPrepSDKCall();
+}
+
 SetPlayerVelocity(client, const Float:vec[3])
 {
     SetEntDataVector(client, offsBaseVelocity, vec, true);
@@ -104,6 +118,11 @@ SetPlayerMoney(client, amount)
 SetPlayerFOV(client, fov)
 {
     SetEntData(client, offsFOV, fov, 1, true);
+}
+
+bool:IsClientInBuyZone(client)
+{
+    return bool:GetEntData(client, offsBuyZone);
 }
 
 SetPlayerMinDist(client, Float:mindist)
@@ -171,5 +190,5 @@ TerminateRound(Float:delay, reason)
     if (tHUD == INVALID_HANDLE)
         return;
     
-    CS_TerminateRound(delay, CSRoundEndReason:reason, false);
+    SDKCall(hTerminateRound, delay, reason);
 }

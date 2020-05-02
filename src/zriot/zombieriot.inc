@@ -28,6 +28,8 @@
 #define DEFAULT_FOV 90
 #define DEFAULT_GRAVITY 1.0
 
+new bool:market;
+
 new String:gMapConfig[PLATFORM_MAX_PATH];
 
 new gDay;
@@ -44,6 +46,9 @@ new Handle:trieDeaths = INVALID_HANDLE;
 
 new gRespawnTime[MAXPLAYERS+1];
 new Handle:tRespawn[MAXPLAYERS+1];
+new Handle:tZVision[MAXPLAYERS+1];
+
+new bool:bZVision[MAXPLAYERS+1];
 
 new Handle:tHUD = INVALID_HANDLE;
 new Handle:tFreeze = INVALID_HANDLE;
@@ -75,6 +80,25 @@ public DXLevelClientQuery(QueryCookie:cookie, client, ConVarQueryResult:result, 
     }
     
     dxLevel[client] = StringToInt(cvarValue);
+}
+
+DisplayClientOverlay(client, const String:overlay[])
+{
+    if (!dxLevel[client])
+    {
+        FindClientDXLevel(client);
+        
+        return;
+    }
+    
+    if (dxLevel[client] >= DXLEVEL_MIN)
+    {
+        ClientCommand(client, "r_screenoverlay \"%s\"", overlay);
+    }
+    else
+    {
+        ZRiot_PrintCenterText(client, "DX90 not supported", dxLevel[client], DXLEVEL_MIN);
+    }
 }
 
 stock GotoNextMap()

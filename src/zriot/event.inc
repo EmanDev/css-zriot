@@ -113,7 +113,11 @@ public Action:PlayerDisconnect(Handle:event, const String:name[], bool:dontBroad
 
 public Action:RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
+    UpdateHostname();
+    
     ChangeLightStyle();
+    
+    RestartAmbience();
     
     ServerCommand("bot_knives_only");
     
@@ -252,6 +256,7 @@ public Action:PlayerTeam_Post(Handle:event, const String:name[], bool:dontBroadc
     
     if (team == gHumanTeam)
     {
+        StopZVision(index);
         SetPlayerFOV(index, DEFAULT_FOV);
         SetEntityGravity(index, DEFAULT_GRAVITY);
         
@@ -339,6 +344,11 @@ public Action:PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
     }
     else
     {
+        if (market)
+        {
+            ZRiot_PrintToChat(index, "!market reminder");
+        }
+        
         new bool:noblock = GetConVarBool(gCvars[CVAR_NOBLOCK]);
         if (noblock)
         {
@@ -357,7 +367,15 @@ public Action:PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
             new cash = GetConVarInt(gCvars[CVAR_CASHAMOUNT]);
             SetPlayerMoney(index, cash);
         }
- 
+        
+        if (tZVision[index] != INVALID_HANDLE)
+        {
+            CloseHandle(tZVision[index]);
+            tZVision[index] = INVALID_HANDLE;
+        }
+        
+        ClientCommand(index, "r_screenoverlay \"\"");
+        
         RemoveTargeters(index);
         UpdateHUDAll();
     }
@@ -488,6 +506,12 @@ public Action:PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
         new ragdoll = GetEntPropEnt(index, Prop_Send, "m_hRagdoll");
         
         CreateTimer(delay, RemoveRagdoll, ragdoll);
+    }
+        
+    if (tZVision[index] != INVALID_HANDLE)
+    {
+        CloseHandle(tZVision[index]);
+        tZVision[index] = INVALID_HANDLE;
     }
 }
 

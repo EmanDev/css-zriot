@@ -1,9 +1,9 @@
 @echo off
 
 set SOURCEDIR=src
-set SMINCLUDES=src\include
-set BUILDDIR=src
-set SPCOMP=src\spcomp.exe
+set SMINCLUDES=env\include
+set BUILDDIR=build
+set SPCOMP=env\win32\bin\spcomp.exe
 
 :: Make build directory.
 if not exist "%BUILDDIR%" (

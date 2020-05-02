@@ -10,6 +10,7 @@ enum ZRiot_ZombieData
 {
     String:data_name[32],
     String:data_model[256],
+    String:data_zvision[256],
     bool:data_override_required,
     data_health,
     Float:data_speed,
@@ -85,6 +86,7 @@ LoadZombieData(bool:defaultconfig)
     decl String:name[64];
     decl String:type[32];
     decl String:model[256];
+    decl String:zvision[256];
     
     zCount = 0;
     
@@ -98,6 +100,9 @@ LoadZombieData(bool:defaultconfig)
         
         KvGetString(kvZombies, "model", model, sizeof(model));
         strcopy(arrayZombies[zCount][data_model], 256, model);
+        
+        KvGetString(kvZombies, "zvision", zvision, sizeof(zvision));
+        strcopy(arrayZombies[zCount][data_zvision], 256, zvision);
         
         arrayZombies[zCount][data_health] = KvGetNum(kvZombies, "health", 500);
         
@@ -238,6 +243,14 @@ ApplyZombieModel(client, zombieid)
         
         PrecacheModel(model);
         SetEntityModel(client, model);
+    }
+}
+
+GetZombieZVision(zombieid, String:zvision[], maxlen)
+{
+    if (IsValidZombieID(zombieid))
+    {
+        strcopy(zvision, maxlen, arrayZombies[zombieid][data_zvision]);
     }
 }
 

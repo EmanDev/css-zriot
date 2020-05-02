@@ -8,6 +8,7 @@
 
 new Handle:hOnClientZombie = INVALID_HANDLE;
 new Handle:hOnClientHuman = INVALID_HANDLE;
+new Handle:hOnClientHUDUpdate = INVALID_HANDLE;
 
 CreateGlobals()
 {
@@ -19,6 +20,7 @@ CreateGlobals()
     
     hOnClientZombie = CreateGlobalForward("ZRiot_OnClientZombie", ET_Ignore, Param_Cell);
     hOnClientHuman = CreateGlobalForward("ZRiot_OnClientHuman", ET_Ignore, Param_Cell);
+    hOnClientHUDUpdate = CreateGlobalForward("ZRiot_OnClientHUDUpdate", ET_Ignore, Param_Cell, Param_String);
 }
 
 public Native_IsClientZombie(Handle:plugin, argc)

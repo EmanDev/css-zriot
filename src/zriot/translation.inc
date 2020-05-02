@@ -71,7 +71,20 @@ stock ZRiot_HudHint(client, any:...)
     decl String:phrase[192];
     
     VFormat(phrase, sizeof(phrase), "%t", 2);
-    PrintHintText(client,phrase);
+    
+    new Handle:hHintText = StartMessageOne("HintText", client);
+    if (hHintText != INVALID_HANDLE)
+    {
+        BfWriteByte(hHintText, -1);
+        
+        Call_StartForward(hOnClientHUDUpdate);
+        Call_PushCell(client);
+        Call_PushStringEx(phrase, sizeof(phrase), SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+        Call_Finish();
+        
+        BfWriteString(hHintText, phrase);
+        EndMessage();
+    }
 }
 
 stock ZRiot_PrintToServer(any:...)
