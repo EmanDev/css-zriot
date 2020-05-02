@@ -1,0 +1,5 @@
+VertexLitGeneric
+{
+	"$basetexture"	"models\player\elis\hk\Estuche"
+ 	"$no_draw" "1"
+}

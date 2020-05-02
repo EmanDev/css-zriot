@@ -12,12 +12,12 @@ materials/models/player/zh/Zombie_Classic_sheet.vmt
 materials/models/player/zh/corpse1.vmt
 materials/models/player/zh/Charple1_sheet.vmt
 
-// Big Zombie
-materials/models/player/ics/hellknight_red/estuche.vmt
-materials/models/player/ics/hellknight_red/estuche.vtf
-materials/models/player/ics/hellknight_red/hellknight.vmt
-materials/models/player/ics/hellknight_red/hellknight.vtf
-materials/models/player/ics/hellknight_red/hellknight_normal.vtf
+// Hellknight
+materials/models/player/elis/hk/Estuche.vmt
+materials/models/player/elis/hk/Estuche.vtf
+materials/models/player/elis/hk/hellknight.vmt
+materials/models/player/elis/hk/hellknight.vtf
+materials/models/player/elis/hk/hellknight_Normal.vtf
 
 // team win overlays
 materials/overlays/zr/zombies_win.vtf

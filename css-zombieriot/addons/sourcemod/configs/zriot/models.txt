@@ -12,6 +12,6 @@
 models/player/zh/zh_charple001
 models/player/zh/zh_zombie003
 models/player/zh/zh_corpse002
-models/player/ics/hellknight_red/t_guerilla
+models/player/elis/hk/hellknight
 
 // ** END DEFAULTS **

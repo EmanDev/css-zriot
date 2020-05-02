@@ -5,21 +5,47 @@ This work contains source files that needs to compiled and has a pre-configured 
 
 ## Configuration Changes
 
-Note: Check for the commits if you want to track changes between files.
+Note: Check for the commits if you want to track changes between files. Check out [Changelog](changelog.md) for all changes.
 
 1. Replace SDKCall with 
+
+   >src\zriot\offsets.inc
+
+   > Offsets.inc
+   >
+   > Remove: Lines 190-193
+
+   ```php
+   if (tHUD == INVALID_HANDLE)
+           return;
+       
+       SDKCall(hTerminateRound, delay, reason);
+   ```
+
+   > Added as Line 194
 
    ```php
    CS_TerminateRound(delay, CSRoundEndReason:reason, false);
    ```
 
-   in offsets.inc
-
 2. Updated Hellknight skin because of errors
 
-3. Added Zombie Maps
+3. Configured maps for Zombie Riot Mod
 
-4. Reserved
+   > css-zriot\css-zombieriot\cfg\sourcemod\zombieriot\zombieriot.cfg
+
+   ````c#
+   // Darkens the map (0: Disable)
+   zriot_dark "1"
+   
+   // The darkness of the map,  a being the darkest,  z being extremely bright when zriot_dark is 1 (n: Default)
+   zriot_dark_level "a"
+   
+   // The sky the map will have when zriot_dark is 1
+   zriot_dark_sky "sky_borealis01"
+   ````
+
+4. More...
 
 ## Releases
 
