@@ -34,7 +34,7 @@ Note: Check for the commits if you want to track changes between files. Check ou
 
    > css-zriot\css-zombieriot\cfg\sourcemod\zombieriot\zombieriot.cfg
 
-   ````c#
+   ````c++
    // Darkens the map (0: Disable)
    zriot_dark "1"
    
