@@ -27,7 +27,7 @@ Note: Changelog contains list of changes from the original archive of the mod.
 
    > css-zriot\css-zombieriot\cfg\sourcemod\zombieriot\zombieriot.cfg
 
-   ````c#
+   ````c++
    // Darkens the map (0: Disable)
    zriot_dark "1"
    
